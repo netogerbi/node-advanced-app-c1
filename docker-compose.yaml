@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    image: advance-node:latest
+    command: nodemon index.js
+    volumes:
+      - .:/usr/src/got/
+      - /usr/src/got/node_modules
+    ports: 
+      - "5000:5000"
+    depends_on:
+      - mongo
+    links:
+      - mongo
+  
+  mongo:
+    image: mongo
+    ports: 
+      - "27017:27017"
+    volumes:
+      - data-volume:/data/db
+
+volumes:
+  data-volume:
+      
