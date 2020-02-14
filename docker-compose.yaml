@@ -4,11 +4,13 @@ services:
   app:
     build: .
     image: advance-node:latest
-    command: nodemon index.js
+    command: npm run dev
     volumes:
-      - .:/usr/src/got/
-      - /usr/src/got/node_modules
+      - .:/usr/src/app/
+      - /usr/src/app/node_modules
+      - /usr/src/app/client/node_modules
     ports: 
+      - "3000:3000"
       - "5000:5000"
     depends_on:
       - mongo
