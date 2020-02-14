@@ -1,12 +1,14 @@
 FROM node:8
 
-RUN mkdir -p /usr/src/got/
+RUN mkdir -p /usr/src/app/
 
-WORKDIR /usr/src/got/
+WORKDIR /usr/src/app/
 
-COPY . /usr/src/got/
+COPY . /usr/src/app/
 
-RUN npm i
+RUN npm i 
+
+RUN cd client && npm i && cd ..
 
 RUN npm i -g --save-dev nodemon
 
