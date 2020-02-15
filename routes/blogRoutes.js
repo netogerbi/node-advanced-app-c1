@@ -21,13 +21,16 @@ module.exports = app => {
   app.get('/api/blogs', requireLogin, async (req, res) => {
     client.get = util.promisify(client.get);
     const cachedBlogs = await client.get(req.user.id);
-    
+
+    console.time('requisistion');    
     if (cachedBlogs) {
-      console.log('SERVING FROM CACHE');
+      console.log('SERVING FROM CACHE: ');
+      console.timeEnd('requisistion');
       return res.send(JSON.parse(cachedBlogs));
     }
-
-    console.log('SERVING FROM MONGO');
+    
+    console.log('SERVING FROM MONGO: ');
+    console.timeEnd('requisistion');
     const blogs = await Blog.find({ _user: req.user.id });
 
     res.send(blogs);
