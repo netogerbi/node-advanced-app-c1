@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const requireLogin = require('../middlewares/requireLogin');
-const util = require('util');
-const redis = require('redis');
-const client = redis.createClient('redis://redis:6379');
+
 
 const Blog = mongoose.model('Blog');
 
@@ -18,10 +16,10 @@ module.exports = app => {
 
 
     app.get('/api/blogs', requireLogin, async (req, res) => {
-        const blogs = Blog.find({ _user: req.user.id });
+        const blogs = await Blog.find({ _user: req.user.id });
+        
         res.send(blogs);
     });
-
 
 
     app.post('/api/blogs', requireLogin, async (req, res) => {
