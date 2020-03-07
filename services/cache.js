@@ -1,33 +1,33 @@
 const mongoose = require('mongoose');
-
-const exec = mongoose.Query.prototype.exec;
-
-mongoose.Query.prototype.exec = function() {
-    console.log('Executando uma query');
-    
-    const key = Object.assign({}, this.getQuery(), { collection: this.mongooseCollection.name });
-    console.log(key);
-
-    return exec.apply(this, arguments);
-}
-
-/*
 const util = require('util');
 const redis = require('redis');
 const client = redis.createClient('redis://redis:6379');
 
 client.get = util.promisify(client.get);
-    const cachedBlogs = await client.get(req.user.id);
-    console.time('requisistion');    
-    if (cachedBlogs) {
-      console.timeEnd('requisistion');
-      console.log('SERVING FROM CACHE');
-      return res.send(JSON.parse(cachedBlogs));
+
+const exec = mongoose.Query.prototype.exec;
+
+mongoose.Query.prototype.exec = async function() {
+    
+    const key = JSON.stringify(Object.assign({}, this.getQuery(), { 
+      collection: this.mongooseCollection.name 
+    }));
+
+    const cacheValue = await client.get(key);
+
+    if (cacheValue) {
+      const docs = JSON.parse(cacheValue);
+
+      // the exe function must return the mongo document instance
+      return Array.isArray(docs) ? docs.map(d => new this.model(d)) : new this.model(docs);
+
     }
-    console.timeEnd('requisistion');
-    console.log('SERVING FROM MONGO');
-    const blogs = await Blog.find({ _user: req.user.id });
 
-    res.send(blogs);
+    // mongoose exec returns a function (mongo document instance)
+    const result = await exec.apply(this, arguments);
 
-    client.set(req.user.id, JSON.stringify(blogs));*/
+    // redis must handle json
+    client.set(key, JSON.stringify(result))
+
+    return result;
+}
