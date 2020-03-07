@@ -7,8 +7,21 @@ client.get = util.promisify(client.get);
 
 const exec = mongoose.Query.prototype.exec;
 
+/**
+ * Create a new function that when called it turns on the cache
+ */
+mongoose.Query.prototype.cache = function() {
+  this.useCache = true;
+  return this; // this allow to use chain functions of mongoose
+}
+
 mongoose.Query.prototype.exec = async function() {
-    
+    if(!this.useCache){
+      console.log('cache not used');
+      return exec.apply(this, arguments);
+    }
+    console.log('cache used');
+
     const key = JSON.stringify(Object.assign({}, this.getQuery(), { 
       collection: this.mongooseCollection.name 
     }));
