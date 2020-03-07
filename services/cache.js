@@ -46,3 +46,14 @@ mongoose.Query.prototype.exec = async function() {
 
     return result;
 }
+
+/**
+ * Used to clear specific cache. 
+ * eg.: When a user create a new blog post, 
+ * it need to be cleaned to recharge the cache with all blogs posts and the new inclusive.
+ */
+module.exports = {
+  clearHash(hashKey) {
+    client.del(JSON.stringify(hashKey));
+  }
+}
