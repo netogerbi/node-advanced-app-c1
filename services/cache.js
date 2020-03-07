@@ -10,31 +10,31 @@ const exec = mongoose.Query.prototype.exec;
 /**
  * Create a new function that when called it turns on the cache
  */
-mongoose.Query.prototype.cache = function(options = {}) {
-  this.useCache = true;
-  this.hashKey = JSON.stringify(options.key || '');
+mongoose.Query.prototype.cache = function (options = {}) {
+    this.useCache = true;
+    this.hashKey = JSON.stringify(options.key || '');
 
-  return this; // this allow to use chain functions of mongoose
+    return this; // this allow to use chain functions of mongoose
 }
 
-mongoose.Query.prototype.exec = async function() {
-    if(!this.useCache){
+mongoose.Query.prototype.exec = async function () {
+    if (!this.useCache) {
 
-      return exec.apply(this, arguments);
+        return exec.apply(this, arguments);
 
     }
 
-    const key = JSON.stringify(Object.assign({}, this.getQuery(), { 
-      collection: this.mongooseCollection.name 
+    const key = JSON.stringify(Object.assign({}, this.getQuery(), {
+        collection: this.mongooseCollection.name
     }));
 
     const cacheValue = await client.hget(this.hashKey, key);
 
     if (cacheValue) {
-      const docs = JSON.parse(cacheValue);
+        const docs = JSON.parse(cacheValue);
 
-      // the exe function must return the mongo document instance
-      return Array.isArray(docs) ? docs.map(d => new this.model(d)) : new this.model(docs);
+        // the exe function must return the mongo document instance
+        return Array.isArray(docs) ? docs.map(d => new this.model(d)) : new this.model(docs);
 
     }
 
@@ -53,7 +53,7 @@ mongoose.Query.prototype.exec = async function() {
  * it need to be cleaned to recharge the cache with all blogs posts and the new inclusive.
  */
 module.exports = {
-  clearHash(hashKey) {
-    client.del(JSON.stringify(hashKey));
-  }
+    clearHash(hashKey) {
+        client.del(JSON.stringify(hashKey));
+    }
 }
